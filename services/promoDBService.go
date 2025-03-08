@@ -59,12 +59,15 @@ func InitDatabase() {
 }
 
 func CreateNewEmployee(shorthand, name, title string) (int64, error) {
-	var id int64
-	err := DB.QueryRow(
-		"INSERT INTO employees (shorthand, name, title) VALUES ($1, $2, $3) RETURNING id",
+	result, err := DB.Exec(
+		"INSERT INTO employees (shorthand, name, title) VALUES (?, ?, ?)",
 		shorthand, name, title,
-	).Scan(&id)
+	)
+	if err != nil {
+		return 0, err
+	}
 
+	id, err := result.LastInsertId()
 	if err != nil {
 		return 0, err
 	}
@@ -73,7 +76,7 @@ func CreateNewEmployee(shorthand, name, title string) (int64, error) {
 }
 
 func DeleteEmployee(id int64) error {
-	_, err := DB.Exec("DELETE FROM employees WHERE id = $1", id)
+	_, err := DB.Exec("DELETE FROM employees WHERE id = ?", id)
 	return err
 }
 
