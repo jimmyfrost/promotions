@@ -2,6 +2,7 @@ package promoDBService
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"promotions/internal/models"
 
@@ -77,6 +78,7 @@ func CreateNewEmployee(shorthand, name, title string) (int64, error) {
 
 func DeleteEmployee(id int64) error {
 	_, err := DB.Exec("DELETE FROM employees WHERE id = ?", id)
+	fmt.Print("in delete...")
 	return err
 }
 
