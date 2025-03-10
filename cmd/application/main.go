@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"promotions/internal/models"
 	promoDBService "promotions/services"
@@ -17,10 +18,15 @@ func main() {
 	r := gin.Default()
 	r.LoadHTMLGlob("../../views/*")
 
-	r.GET("/employee", GetEmployees)
-	r.POST("/employee", CreateEmployee)
+	r.GET("/employees", GetEmployees)
+	r.POST("/employees", CreateEmployee)
 	// r.PUT("/employee", GetEmployees)
-	r.DELETE("/employee/:id", DeleteEmployee)
+	r.DELETE("/employees/:id", DeleteEmployee)
+
+	r.GET("/achievement", GetAchievements)
+	r.POST("/achievement", CreateAchievement)
+	// r.PUT("/employee", GetEmployees)
+	r.DELETE("/achievement/:id", DeleteAchievement)
 
 	r.Run(":8080")
 }
@@ -35,11 +41,12 @@ func GetEmployees(c *gin.Context) {
 func CreateEmployee(c *gin.Context) {
 	var emp models.Employee
 
-	emp.Shorthand = c.Request.FormValue("shorthand")
+	emp.Email = c.Request.FormValue("email")
 	emp.Name = c.Request.FormValue("name")
 	emp.Title = c.Request.FormValue("title")
+	emp.Track = c.Request.FormValue("track")
 
-	_, err := promoDBService.CreateNewEmployee(emp.Shorthand, emp.Name, emp.Title)
+	_, err := promoDBService.CreateNewEmployee(emp.Email, emp.Name, emp.Title, emp.Track)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -58,7 +65,52 @@ func DeleteEmployee(c *gin.Context) {
 	if err != nil {
 		fmt.Print("Couldnt delete:", err)
 	}
-	c.HTML(http.StatusOK, "employee.html", gin.H{
+	c.HTML(http.StatusOK, "employees.html", gin.H{
+		"deleted": id,
+	})
+}
+
+func GetAchievements(c *gin.Context) {
+	achievements := promoDBService.ReadEmployeesList()
+	c.HTML(http.StatusOK, "base", gin.H{
+		"achievements": achievements,
+	})
+}
+
+func CreateAchievement(c *gin.Context) {
+	var achievement models.Achievement
+
+	achievement.Situation = c.Request.FormValue("situation")
+	achievement.Task = c.Request.FormValue("task")
+	achievement.Action = c.Request.FormValue("action")
+	achievement.Result = c.Request.FormValue("result")
+	empVal, err := strconv.ParseInt(c.Request.FormValue("employeeId"), 10, 64)
+	if err != nil {
+		log.Fatal("Could not bind employeeId")
+	}
+
+	achievement.EmployeeID = empVal
+
+	_, err2 := promoDBService.CreateAchievement(achievement.Situation, achievement.Task, achievement.Action, achievement.Result, achievement.EmployeeID)
+	if err2 != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err2.Error()})
+		return
+	}
+
+	employees := promoDBService.ReadEmployeesList()
+	c.HTML(http.StatusOK, "display", gin.H{
+		"employees": employees,
+	})
+}
+
+func DeleteAchievement(c *gin.Context) {
+	param := c.Param("id")
+	id, _ := strconv.ParseInt(param, 10, 64)
+	err := promoDBService.DeleteEmployee(id)
+	if err != nil {
+		fmt.Print("Couldnt delete:", err)
+	}
+	c.HTML(http.StatusOK, "employees.html", gin.H{
 		"deleted": id,
 	})
 }

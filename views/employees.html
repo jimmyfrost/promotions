@@ -1,0 +1,71 @@
+{{ block "base" . }}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title></title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body>
+        {{ template "createEmployee" . }}
+        <hr />
+        {{ template "display" . }}
+    </body>
+</html>
+{{ end }}
+
+{{ block "createEmployee" . }}
+<form hx-target="#displayDiv" hx-swap="outerHTML" hx-post="/employees">
+    <div class="space-y-2">
+        <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+        <input type="text" name="email" id="email" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" placeholder="e.g. jsmith" />
+    </div>
+    <div class="space-y-2">
+        <label for="name" class="block text-sm font-medium text-gray-700">Full Name</label>
+        <input type="text" name="name" id="name" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" placeholder="e.g. Jane Smith" />
+    </div>
+    <div class="space-y-2">
+        <label for="title" class="block text-sm font-medium text-gray-700">Title</label>
+        <input type="text" name="title" id="title" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" placeholder="e.g. Software Engineer" />
+    </div>
+    <div class="space-y-2">
+        <label for="track" class="block text-sm font-medium text-gray-700">Career Track</label>
+        <input type="text" name="track" id="track" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" placeholder="e.g. Leadership" />
+    </div>
+    <div>
+        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md shadow-sm transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            Add Employee
+        </button>
+    </div>
+</form>
+{{ end }}
+
+{{ block "display" . }}
+    <div id="displayDiv" style="display: flex; flex-direction: column;">
+        <div>
+            <table id="employeeTable" class="min-w-full divide-y divide-gray-200">
+                <thead>
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Full Name</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Track</th>
+                    </tr>
+                </thead>
+                <tbody id="employeeTableBody" class="bg-white divide-y divide-gray-200">
+                {{range .employees }}
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ .Email }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ .Name }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ .Title }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ .Track }}</td>
+                </tr>
+                {{ end }}
+                </tbody>
+            </table>    
+        </div>
+        
+    </div>
+{{ end }}
