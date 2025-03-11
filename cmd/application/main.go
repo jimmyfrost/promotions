@@ -15,6 +15,9 @@ func main() {
 	promoDBService.InitDatabase()
 	defer promoDBService.DB.Close()
 
+	fs := http.FileServer(http.Dir("static"))
+	http.Handle("/static/", http.StripPrefix("/static/", fs))
+
 	r := gin.Default()
 	r.LoadHTMLGlob("../../views/*")
 

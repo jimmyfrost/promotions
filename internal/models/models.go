@@ -35,3 +35,7 @@ type Achievement struct {
 	Result     string
 	EmployeeID int64
 }
+
+func (ach Achievement) GenerateResumeItem() (lineItem string) {
+	return ach.Situation + " " + ach.Result //Temp
+}
