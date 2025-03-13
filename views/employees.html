@@ -9,7 +9,9 @@
         <link
   rel="stylesheet"
   href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
->       <style>
+>       
+        <script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
+        <style>
             :root {
                 --pico-font-size: 90%; /* Adjust typography scale */
                 --pico-spacing: 0.75rem; /* Adjust spacing */
@@ -40,7 +42,7 @@
                     <div class="div1">{{ template "createEmployee" . }}</div>
                     <div class="div2">{{ template "display" . }}</div>
                     <div class="div3">Goals Section</div>
-                    <div class="div4">Achievements Section</div>
+                    <div class="div4">{{ template "achievements" . }}</div>
                 </div>
 
         </main>
@@ -89,7 +91,7 @@
                 <tbody id="employeeTableBody">
                 {{range .employees }}
                 <tr>
-                    <td>{{ .Email }}</td>
+                    <td hx-get="/employees" hx-vals='{"id": "{{ .ID }}", "action": "getAchievements"}' hx-trigger="click" style="cursor: pointer;">{{ .Email }}</td>
                     <td>{{ .Name }}</td>
                     <td>{{ .Title }}</td>
                     <td>{{ .Track }}</td>
@@ -99,5 +101,33 @@
             </table>    
         </div>
         
+        
+    </div>
+{{ end }}
+
+{{ block "achievements" . }}
+    <div class="achievementsDisplay">
+        <div>
+            <table id="achievementTable">
+                <thead>
+                    <tr>
+                        <th>Situation</th>
+                        <th>Task</th>
+                        <th>Action</th>
+                        <th>Result</th>
+                    </tr>
+                </thead>
+                <tbody id="achievementTableBody">
+                {{range .achievements }}
+                <tr>
+                    <td>{{ .Situation }}</td>
+                    <td>{{ .Task }}</td>
+                    <td>{{ .Action }}</td>
+                    <td>{{ .Result }}</td>
+                </tr>
+                {{ end }}
+                </tbody>
+            </table>    
+        </div>
     </div>
 {{ end }}

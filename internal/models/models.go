@@ -28,14 +28,11 @@ type Suggestion struct {
 }
 
 type Achievement struct {
-	ID         string
-	Situation  string
-	Task       string
-	Action     string
-	Result     string
-	EmployeeID int64
-}
-
-func (ach Achievement) GenerateResumeItem() (lineItem string) {
-	return ach.Situation + " " + ach.Result //Temp
+	ID         int64  `json:"achID"`
+	Situation  string `json:"situation"`
+	Task       string `json:"task"`
+	Action     string `json:"action"`
+	Result     string `json:"result"`
+	ResumeLine string `json:"resumeLine"`
+	EmployeeID int64  `json:"fkEmployeeId"`
 }

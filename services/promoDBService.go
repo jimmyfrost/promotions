@@ -75,6 +75,7 @@ func InitDatabase() {
 }
 
 func CreateNewEmployee(email, name, title, track string) (int64, error) {
+	log.Print("Creating Employee")
 	result, err := DB.Exec(
 		"INSERT INTO employees (email, name, title, track) VALUES (?, ?, ?, ?)",
 		email, name, title, track,
@@ -117,6 +118,33 @@ func ReadEmployeesList() []models.Employee {
 	}
 
 	return emps
+}
+
+func GetAchievementsByEmployeeID(id int64) []models.Achievement {
+	rows, err := DB.Query("SELECT situation, task, action, result FROM achievements WHERE employee_id = ?", id)
+	if err != nil {
+		log.Println("Error reading achievements:", err)
+		return nil
+	}
+	defer rows.Close()
+
+	achievements := make([]models.Achievement, 0)
+	for rows.Next() {
+		var achievement models.Achievement
+		err := rows.Scan(&achievement.Situation, &achievement.Task, &achievement.Action, &achievement.Result)
+		if err != nil {
+			log.Println("Error scanning row:", err)
+			continue
+		}
+		achievements = append(achievements, achievement)
+	}
+
+	if len(achievements) < 1 {
+		tempAchievement := models.Achievement{Situation: "Needed better code", Task: "Write Better Code", Action: "Add code to IDE", Result: "So much Profit"}
+		achievements = append(achievements, tempAchievement)
+	}
+
+	return achievements
 }
 
 func CreateGoal(title string, details string, time int, employeeId int64) (int64, error) {
