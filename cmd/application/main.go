@@ -11,6 +11,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type RequestPayload struct {
+	Action string `json:"action"`
+	ID     string `json:"data"`
+}
+
 func main() {
 	promoDBService.InitDatabase()
 	defer promoDBService.DB.Close()
@@ -21,17 +26,35 @@ func main() {
 	r := gin.Default()
 	r.LoadHTMLGlob("../../views/*")
 
-	r.GET("/employees", GetEmployees)
+	r.GET("/employees", employeeGetRouter)
 	r.POST("/employees", CreateEmployee)
 	// r.PUT("/employee", GetEmployees)
 	r.DELETE("/employees/:id", DeleteEmployee)
 
-	r.GET("/achievement", GetAchievements)
-	r.POST("/achievement", CreateAchievement)
+	//r.GET("/achievement", GetAchievements)
+	//r.POST("/achievement", CreateAchievement)
 	// r.PUT("/employee", GetEmployees)
-	r.DELETE("/achievement/:id", DeleteAchievement)
+	//r.DELETE("/achievement/:id", DeleteAchievement)
 
 	r.Run(":8080")
+}
+
+func employeeGetRouter(c *gin.Context) {
+	log.Print("Entered Router")
+	var payload RequestPayload
+
+	payload.Action = c.Query("action")
+	payload.ID = c.Query("id")
+
+	fmt.Print()
+
+	switch payload.Action {
+	case "getAchievements":
+		id, _ := strconv.ParseInt(payload.ID, 10, 64)
+		GetAchievements(c, id)
+	default:
+		GetEmployees(c)
+	}
 }
 
 func GetEmployees(c *gin.Context) {
@@ -42,6 +65,7 @@ func GetEmployees(c *gin.Context) {
 }
 
 func CreateEmployee(c *gin.Context) {
+	log.Print("Creating Employee")
 	var emp models.Employee
 
 	emp.Email = c.Request.FormValue("email")
@@ -73,9 +97,10 @@ func DeleteEmployee(c *gin.Context) {
 	})
 }
 
-func GetAchievements(c *gin.Context) {
-	achievements := promoDBService.ReadEmployeesList()
-	c.HTML(http.StatusOK, "base", gin.H{
+func GetAchievements(c *gin.Context, id int64) {
+	log.Print("Employee Clicked")
+	achievements := promoDBService.GetAchievementsByEmployeeID(id)
+	c.HTML(http.StatusOK, "achievements", gin.H{
 		"achievements": achievements,
 	})
 }
