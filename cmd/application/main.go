@@ -24,12 +24,12 @@ func main() {
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
 	r := gin.Default()
-	r.LoadHTMLGlob("../../views/*")
+	r.LoadHTMLGlob("../../templates/pages/*")
 
-	r.GET("/employees", employeeGetRouter)
-	r.POST("/employees", CreateEmployee)
+	r.GET("templates/pages/employees", employeeGetRouter)
+	r.POST("templates/pages/employees", CreateEmployee)
 	// r.PUT("/employee", GetEmployees)
-	r.DELETE("/employees/:id", DeleteEmployee)
+	r.DELETE("templates/pages/employees/:id", DeleteEmployee)
 
 	//r.GET("/achievement", GetAchievements)
 	//r.POST("/achievement", CreateAchievement)
